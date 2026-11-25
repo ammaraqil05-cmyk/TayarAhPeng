@@ -1,0 +1,13 @@
+name = "tayarahpeng"
+main = "src/index.js"
+compatibility_date = "2025-03-01"
+workers_dev = true
+
+[assets]
+directory = "./public"
+binding = "ASSETS"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "tayarahpeng"
+database_id = "724d6082-0d96-4b54-a92a-3952acc9db54"

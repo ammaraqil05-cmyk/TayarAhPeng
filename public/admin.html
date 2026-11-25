@@ -1,0 +1,274 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Panel Admin CMS — Kedai Tayar Ah Peng</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/styles.css" />
+  <link rel="stylesheet" href="/css/admin.css" />
+</head>
+<body>
+  <!-- Login View -->
+  <section id="loginView" class="login-wrap">
+    <div class="login-card">
+      <div style="display:flex; align-items:center; gap:12px; margin-bottom:18px;">
+        <div class="brand-badge" style="width:44px; height:44px; font-size:22px;">🛞</div>
+        <div>
+          <h1 style="margin:0; font-size:1.25rem;">Panel Admin CMS</h1>
+          <p style="margin:2px 0 0; font-size:0.85rem; color:#57534e;">Kedai Tayar Ah Peng</p>
+        </div>
+      </div>
+
+      <div id="loginAlert" class="alert-box alert-error hidden"></div>
+
+      <form id="loginForm">
+        <div class="form-group">
+          <label for="adminPasswordInput">Kata Laluan Admin</label>
+          <input
+            id="adminPasswordInput"
+            class="form-control"
+            type="password"
+            required
+            autocomplete="current-password"
+            placeholder="Masukkan ADMIN_PASSWORD..."
+          />
+        </div>
+        <button id="loginBtn" class="btn btn-primary" style="width:100%;" type="submit">
+          🔐 Log Masuk Admin
+        </button>
+      </form>
+
+      <div style="margin-top:16px; text-align:center;">
+        <a href="/" class="btn btn-secondary btn-sm">← Kembali ke Skrin Kiosk</a>
+      </div>
+    </div>
+  </section>
+
+  <!-- Dashboard View -->
+  <div id="dashboardView" class="hidden">
+    <header class="kiosk-header">
+      <div class="header-inner">
+        <div class="brand-wrap">
+          <div class="brand-badge" aria-hidden="true">🛠️</div>
+          <div>
+            <h1 id="adminShopTitle" class="brand-title">Admin CMS — Kedai Tayar Ah Peng</h1>
+            <p class="brand-banner">Urus pesanan dapur, menu, kategori, gambar & status kedai</p>
+          </div>
+        </div>
+
+        <div class="header-actions">
+          <button id="quickToggleStoreBtn" class="btn btn-sm btn-secondary" type="button">
+            Status Kedai
+          </button>
+          <a href="/" target="_blank" class="btn btn-ghost-light btn-sm">🖥️ Buka Kiosk</a>
+          <button id="logoutBtn" class="btn btn-ghost-light btn-sm" type="button">Log Keluar</button>
+        </div>
+      </div>
+    </header>
+
+    <main class="admin-shell">
+      <div class="admin-tabs" role="tablist">
+        <button type="button" class="admin-tab-btn active" data-tab="orders">🍳 Pesanan Dapur</button>
+        <button type="button" class="admin-tab-btn" data-tab="menu">🍜 Menu & Harga</button>
+        <button type="button" class="admin-tab-btn" data-tab="categories">🗂️ Kategori</button>
+        <button type="button" class="admin-tab-btn" data-tab="settings">🏪 Tetapan Kedai</button>
+      </div>
+
+      <!-- TAB 1: ORDERS -->
+      <section id="tab-orders" class="panel-card">
+        <div class="panel-head">
+          <h2>🍳 Pengurusan Pesanan Dapur</h2>
+          <div style="display:flex; gap:8px; flex-wrap:wrap; align-items:center;">
+            <select id="orderStatusFilter" class="form-control" style="width:auto; padding:8px 12px;">
+              <option value="all">Semua Status</option>
+              <option value="pending">⏳ Menunggu Dapur</option>
+              <option value="preparing">🔥 Sedang Disediakan</option>
+              <option value="ready">🔔 Sedia Diambil</option>
+              <option value="completed">✅ Selesai</option>
+              <option value="cancelled">❌ Dibatalkan</option>
+            </select>
+            <button id="refreshOrdersBtn" class="btn btn-secondary btn-sm" type="button">🔄 Muat Semula</button>
+          </div>
+        </div>
+        <div id="ordersContainer" class="orders-grid"></div>
+      </section>
+
+      <!-- TAB 2: MENU ITEMS -->
+      <section id="tab-menu" class="panel-card hidden">
+        <div class="panel-head">
+          <h2>🍜 Senarai Menu & Tukar Harga Cepat</h2>
+          <div style="display:flex; gap:10px; flex-wrap:wrap;">
+            <select id="menuCategoryFilter" class="form-control" style="width:auto; padding:8px 12px;">
+              <option value="all">Semua Kategori</option>
+            </select>
+            <button id="openAddItemBtn" class="btn btn-primary" type="button">➕ Tambah Item Menu</button>
+          </div>
+        </div>
+
+        <div class="table-wrap">
+          <table class="cms-table">
+            <thead>
+              <tr>
+                <th>Menu</th>
+                <th>Kategori</th>
+                <th>Harga Cepat (RM)</th>
+                <th>Status</th>
+                <th>Tindakan</th>
+              </tr>
+            </thead>
+            <tbody id="menuTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 3: CATEGORIES -->
+      <section id="tab-categories" class="panel-card hidden">
+        <div class="panel-head">
+          <h2>🗂️ Pengurusan Kategori</h2>
+        </div>
+
+        <form id="addCategoryForm" style="display:flex; gap:10px; flex-wrap:wrap; margin-bottom:20px; align-items:flex-end;">
+          <div class="form-group" style="margin:0; flex:1; min-width:180px;">
+            <label for="newCatName">Nama Kategori Baru</label>
+            <input id="newCatName" class="form-control" type="text" required placeholder="cth: Pencuci Mulut" />
+          </div>
+          <div class="form-group" style="margin:0; width:90px;">
+            <label for="newCatEmoji">Emoji</label>
+            <input id="newCatEmoji" class="form-control" type="text" value="🍽️" maxlength="8" />
+          </div>
+          <div class="form-group" style="margin:0; width:90px;">
+            <label for="newCatOrder">Susunan</label>
+            <input id="newCatOrder" class="form-control" type="number" value="5" />
+          </div>
+          <button class="btn btn-primary" type="submit">➕ Tambah Kategori</button>
+        </form>
+
+        <div class="table-wrap">
+          <table class="cms-table">
+            <thead>
+              <tr>
+                <th>Emoji & Nama</th>
+                <th>Susunan</th>
+                <th>Bil. Item</th>
+                <th>Status</th>
+                <th>Tindakan</th>
+              </tr>
+            </thead>
+            <tbody id="categoriesTableBody"></tbody>
+          </table>
+        </div>
+      </section>
+
+      <!-- TAB 4: SETTINGS -->
+      <section id="tab-settings" class="panel-card hidden">
+        <div class="panel-head">
+          <h2>🏪 Tetapan Kedai</h2>
+        </div>
+
+        <form id="settingsForm" style="max-width:620px;">
+          <div class="form-group">
+            <label for="settingShopName">Nama Kedai</label>
+            <input id="settingShopName" class="form-control" type="text" required maxlength="80" />
+          </div>
+          <div class="form-group">
+            <label for="settingBannerText">Teks Banner Kiosk</label>
+            <textarea id="settingBannerText" class="form-control" rows="3" maxlength="240"></textarea>
+          </div>
+          <div class="form-group">
+            <label for="settingIsOpen">Status Operasi Kedai</label>
+            <select id="settingIsOpen" class="form-control">
+              <option value="1">🟢 Kedai Dibuka (Terima Pesanan)</option>
+              <option value="0">🔴 Kedai Ditutup (Sekat Pesanan Baru)</option>
+            </select>
+          </div>
+          <button class="btn btn-primary" type="submit">💾 Simpan Tetapan Kedai</button>
+        </form>
+      </section>
+    </main>
+  </div>
+
+  <!-- Add / Edit Item Modal -->
+  <div id="itemModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="itemModalTitle">
+    <div class="modal-card" style="max-width:560px;">
+      <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+        <h2 id="itemModalTitle" style="margin:0;">Tambah Item Menu</h2>
+        <button id="closeItemModalBtn" class="btn btn-secondary btn-sm" type="button">Tutup</button>
+      </div>
+
+      <form id="itemForm">
+        <input type="hidden" id="itemFormId" />
+        <input type="hidden" id="itemFormImageId" />
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="itemName">Nama Menu</label>
+            <input id="itemName" class="form-control" type="text" required maxlength="100" />
+          </div>
+          <div class="form-group">
+            <label for="itemCategory">Kategori</label>
+            <select id="itemCategory" class="form-control" required></select>
+          </div>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="itemPrice">Harga (RM)</label>
+            <input id="itemPrice" class="form-control" type="number" step="0.05" min="0" required placeholder="8.50" />
+          </div>
+          <div class="form-group">
+            <label for="itemEmoji">Emoji Fallback</label>
+            <input id="itemEmoji" class="form-control" type="text" maxlength="8" value="🍜" />
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="itemDesc">Penerangan</label>
+          <textarea id="itemDesc" class="form-control" rows="2" maxlength="300"></textarea>
+        </div>
+
+        <div class="form-grid-2">
+          <div class="form-group">
+            <label for="itemSortOrder">Susunan</label>
+            <input id="itemSortOrder" class="form-control" type="number" value="0" />
+          </div>
+          <div class="form-group">
+            <label for="itemIsActive">Status</label>
+            <select id="itemIsActive" class="form-control">
+              <option value="1">Aktif</option>
+              <option value="0">Tidak Aktif</option>
+            </select>
+          </div>
+        </div>
+
+        <div class="form-group">
+          <label for="itemImageInput">Muat Naik Gambar (Auto-mampat max 480px &lt; 95 KB)</label>
+          <input id="itemImageInput" class="form-control" type="file" accept="image/*" />
+        </div>
+
+        <div class="upload-preview-box" style="margin-bottom:16px;">
+          <img id="itemImagePreview" class="upload-preview-img hidden" alt="Pratonton gambar" />
+          <div id="itemImageEmpty" style="font-size:2.2rem;">🖼️</div>
+          <div style="flex:1; font-size:0.84rem; color:#57534e;">
+            <div id="imageStatusText">Tiada gambar dimuat naik (emoji akan digunakan).</div>
+            <button id="removeImageBtn" type="button" class="btn btn-secondary btn-sm hidden" style="margin-top:6px;">
+              🗑️ Buang Gambar
+            </button>
+          </div>
+        </div>
+
+        <div style="display:flex; gap:10px; justify-content:flex-end;">
+          <button id="cancelItemBtn" class="btn btn-secondary" type="button">Batal</button>
+          <button id="saveItemBtn" class="btn btn-primary" type="submit">💾 Simpan Menu</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden" role="status"></div>
+
+  <script src="/js/admin.js"></script>
+</body>
+</html>

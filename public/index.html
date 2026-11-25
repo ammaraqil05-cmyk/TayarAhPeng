@@ -1,0 +1,147 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Kedai Tayar Ah Peng — Skrin Tempahan Layan Diri</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<body>
+  <header class="kiosk-header">
+    <div class="header-inner">
+      <div class="brand-wrap">
+        <div class="brand-badge" aria-hidden="true">🛞</div>
+        <div>
+          <h1 id="shopName" class="brand-title">Kedai Tayar Ah Peng</h1>
+          <p id="bannerText" class="brand-banner">Memuatkan menu terkini...</p>
+        </div>
+      </div>
+
+      <div class="header-actions">
+        <span id="storeStatusPill" class="status-pill open">
+          <span class="dot"></span>
+          <span id="storeStatusLabel">Dibuka</span>
+        </span>
+        <button id="activeOrderBtn" class="btn btn-primary btn-sm hidden" type="button">
+          🎫 Giliran: <span id="activeQueueChip"></span>
+        </button>
+        <a href="/admin.html" class="btn btn-ghost-light btn-sm">⚙️ Admin CMS</a>
+      </div>
+    </div>
+  </header>
+
+  <div id="closedBanner" class="closed-banner hidden">
+    <div class="closed-banner-box">
+      <span>🚫</span>
+      <span>Maaf, kedai sedang ditutup buat sementara waktu. Tempahan baru tidak dapat dibuat sekarang.</span>
+    </div>
+  </div>
+
+  <main class="kiosk-layout">
+    <section aria-label="Menu Makanan">
+      <div class="menu-toolbar">
+        <div class="search-box">
+          <span class="search-icon" aria-hidden="true">🔍</span>
+          <input id="searchInput" type="search" placeholder="Cari makanan atau minuman (cth: Nasi Lemak, Kopi)..." />
+        </div>
+        <div id="categoryTabs" class="category-tabs" role="tablist" aria-label="Kategori Menu"></div>
+      </div>
+
+      <div id="menuGrid" class="menu-grid"></div>
+    </section>
+
+    <aside id="cartPanel" class="cart-panel" aria-label="Troli Tempahan">
+      <div class="cart-header">
+        <h2>🛒 Troli Anda</h2>
+        <button id="clearCartBtn" class="btn btn-secondary btn-sm" type="button">Kosongkan</button>
+      </div>
+
+      <div class="order-type-grid" role="group" aria-label="Pilihan Makan Sini atau Bungkus">
+        <button type="button" class="order-type-btn active" data-order-type="dine_in">
+          <span class="icon">🍽️</span>
+          <span>Makan Sini</span>
+        </button>
+        <button type="button" class="order-type-btn" data-order-type="takeaway">
+          <span class="icon">🥡</span>
+          <span>Bungkus</span>
+        </button>
+      </div>
+
+      <div id="cartItems" class="cart-items">
+        <div class="cart-empty">Belum ada item dipilih. Pilih menu di sebelah untuk mula memesan.</div>
+      </div>
+
+      <textarea
+        id="customerNote"
+        class="cart-note"
+        rows="2"
+        maxlength="200"
+        placeholder="Catatan dapur (pilihan): cth. kurang manis, tiada taugeh..."
+      ></textarea>
+
+      <div class="cart-summary">
+        <div class="total-row">
+          <span>Jumlah Bayaran</span>
+          <span id="cartTotal" class="total-amount">RM 0.00</span>
+        </div>
+        <button id="submitOrderBtn" class="btn btn-primary" type="button" disabled>
+          ✅ Hantar Pesanan Sekarang
+        </button>
+      </div>
+    </aside>
+  </main>
+
+  <div class="mobile-cart-bar">
+    <div>
+      <strong id="mobileCartSummary">0 item · RM 0.00</strong>
+    </div>
+    <button id="toggleMobileCartBtn" class="btn btn-primary btn-sm" type="button">Lihat Troli</button>
+  </div>
+
+  <!-- Order Queue & Live Status Modal -->
+  <div id="orderModal" class="modal-backdrop hidden" role="dialog" aria-modal="true" aria-labelledby="orderModalTitle">
+    <div class="modal-card">
+      <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+        <h2 id="orderModalTitle" style="margin:0; font-size:1.25rem;">Resit & Status Langsung</h2>
+        <button id="closeModalBtn" class="btn btn-secondary btn-sm" type="button">Tutup</button>
+      </div>
+
+      <div class="queue-ticket">
+        <div class="queue-label">Nombor Giliran Anda</div>
+        <div id="modalQueueNumber" class="queue-number">AP-001</div>
+        <div id="modalOrderType" style="font-weight:700; color:#57534e;">🍽️ Makan Sini</div>
+        <div id="modalLiveBadge" class="live-badge live-pending">⏳ Menunggu Dapur</div>
+      </div>
+
+      <div id="statusSteps" class="status-steps">
+        <div class="step-box" data-step="pending">1. Diterima</div>
+        <div class="step-box" data-step="preparing">2. Dimasak</div>
+        <div class="step-box" data-step="ready">3. Sedia!</div>
+        <div class="step-box" data-step="completed">4. Selesai</div>
+      </div>
+
+      <p id="modalPollHint" style="text-align:center; font-size:0.82rem; color:#57534e; margin:6px 0 0;">
+        Status dikemas kini secara automatik setiap 4 saat.
+      </p>
+
+      <div id="modalItems" class="ticket-items"></div>
+
+      <div class="total-row" style="margin-top:14px; padding-top:10px; border-top:1px dashed #e7e2da;">
+        <span>Jumlah</span>
+        <span id="modalTotal" class="total-amount">RM 0.00</span>
+      </div>
+
+      <div style="margin-top:16px; display:flex; gap:10px;">
+        <button id="newOrderBtn" class="btn btn-primary" style="flex:1;" type="button">➕ Buat Pesanan Baru</button>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast hidden" role="status"></div>
+
+  <script src="/js/kiosk.js"></script>
+</body>
+</html>
